@@ -24,54 +24,61 @@
           <div class="modal-body">
             <form action>
               <div class="form-group">
-                <label for>First Name</label>
+                <label for="photo">Photo</label>
+                <input
+                  type="file"
+                  accept="image/jpeg, image/png"
+                  class="form-control"
+                  v-on:change="form.photo"
+                  placeholder="Photo"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for="first_name">First Name</label>
                 <input
                   type="text"
                   class="form-control"
-                  v-model="first_name"
+                  v-model="form.first_name"
                   placeholder="First Name"
                   required
                 >
               </div>
               <div class="form-group">
-                <label for>First Name</label>
+                <label for="last_name">Last Name</label>
                 <input
                   type="text"
                   class="form-control"
-                  v-model="last_name"
+                  v-model="form.last_name"
                   placeholder="Last Name"
                   required
                 >
               </div>
               <div class="form-group">
-                <label for>Hobbies</label>
+                <label for="hobbies">Hobbies</label>
                 <input
                   type="text"
                   class="form-control"
-                  v-model="hobbies"
+                  v-model="form.hobbies"
                   placeholder="Hobbies"
                   required
                 >
               </div>
               <div class="form-group">
-                <label for>Birth Date</label>
+                <label for="birth_date">Birth Date</label>
                 <input
                   type="date"
                   class="form-control"
-                  v-model="birth_date"
+                  v-model="form.birth_date"
                   placeholder="Date of Birth"
                   required
                 >
-              </div>
-              <div class="form-group">
-                <label for>Photo</label>
-                <input type="file" class="form-control" placeholder="Photo" required>
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-primary" @click="handleOk">Save</button>
           </div>
         </div>
       </div>
@@ -231,32 +238,28 @@ export default {
           type: "error"
         });
       } else if (this.form.first_name === "") {
-        this.$toasted.show("Enter a wallet name", {
+        this.$toasted.show("Enter a first name", {
           type: "error"
         });
       } else if (this.form.last_name === "") {
-        this.$toasted.show("Enter a wallet number", {
+        this.$toasted.show("Enter a last name", {
           type: "error"
         });
       } else if (!this.form.birth_date) {
-        this.$toasted.show("Select a wallet type", {
+        this.$toasted.show("Select a birth date", {
           type: "error"
         });
       } else if (!this.form.hobbies) {
-        this.$toasted.show("", {
+        this.$toasted.show("Input some hobbies", {
           type: "error"
         });
       } else {
+        // everything is good
         this.handleSubmit();
       }
-    }
+    },
+    handleSubmit() {}
   },
-  computed: {
-    studentCount: function() {
-      this.$store.getters.studentSize;
-    }
-  },
-
   created() {
     this.fetchStudents();
     this.validateStudentCount();
