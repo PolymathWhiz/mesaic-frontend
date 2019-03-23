@@ -22,7 +22,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form action>
+            <form @submit.stop.prevent="addStudent">
               <div class="form-group">
                 <label for="photo">Photo</label>
                 <input
@@ -254,11 +254,10 @@ export default {
           type: "error"
         });
       } else {
-        // everything is good
-        this.handleSubmit();
+        // everything is good, add student
+        this.addStudent();
       }
-    },
-    handleSubmit() {}
+    }
   },
   created() {
     this.fetchStudents();
