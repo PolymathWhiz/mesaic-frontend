@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="add_btn" style="display: flex ; justify-content: center;">
-      <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Student</button>
+      <button class="btn btn-success btn-lg" data-toggle="modal" data-target="#addModal">Add Student</button>
     </div>
 
     <!-- Add Modal -->
@@ -84,7 +84,7 @@
               data-dismiss="modal"
               @click="closeModal()"
             >Close</button>
-            <button type="button" class="btn btn-primary" @click="handleOk">Save</button>
+            <button type="button" class="btn btn-primary" @click="handleAddOk">Save</button>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@
               data-dismiss="modal"
               @click="closeModal()"
             >Close</button>
-            <button type="button" class="btn btn-primary" @click="handleOk">Save</button>
+            <button type="button" class="btn btn-primary" @click="handleEditOk">Save</button>
           </div>
         </div>
       </div>
@@ -222,6 +222,7 @@
                   class="btn btn-primary btn-sm"
                   data-toggle="modal"
                   data-target="#editModal"
+                  @click="callSelected(item.id)"
                 >Edit</button>
                 <button
                   class="btn btn-danger btn-sm"
@@ -265,7 +266,8 @@ export default {
         hobbies: "",
         photo: "",
         birth_date: ""
-      }
+      },
+      selectedStudent: ""
     };
   },
   methods: {
@@ -337,9 +339,10 @@ export default {
         }
       }
     },
-    async editStudent(id) {
+    async editStudent() {
       try {
         const newDate = this.normalizeBirthDate(this.form.birth_date);
+        const id = this.selectedStudent;
 
         let formData = new FormData();
         formData.append("first_name", this.form.first_name);
@@ -348,11 +351,13 @@ export default {
         formData.append("hobbies", this.form.hobbies);
         formData.append("photo", this.form.photo);
 
-        const response = await this.$http.post(`/${id}`, formData);
+        const response = await this.$http.patch(`/${id}`, formData);
+
         this.$toasted.show(response.data.message, {
           type: "success"
         });
-        return;
+
+        return this.$router.go();
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
@@ -362,9 +367,10 @@ export default {
         }
       }
     },
-    handleOk(evt) {
+    handleAddOk(evt) {
       // Prevent modal from closing
-      evt.preventDefault();
+      if (evt) evt.preventDefault();
+
       if (!this.form.photo) {
         this.$toasted.show("Please select a photo", {
           type: "error"
@@ -391,7 +397,40 @@ export default {
         });
       } else {
         // everything is good, add student
-        this.addStudent();
+        return this.addStudent();
+      }
+    },
+    handleEditOk(evt) {
+      // Prevent modal from closing
+      if (evt) evt.preventDefault();
+
+      if (!this.form.photo) {
+        this.$toasted.show("Please select a photo", {
+          type: "error"
+        });
+      } else if (this.form.first_name === "") {
+        this.$toasted.show("Enter a first name", {
+          type: "error"
+        });
+      } else if (this.form.last_name === "") {
+        this.$toasted.show("Enter a last name", {
+          type: "error"
+        });
+      } else if (!this.form.birth_date) {
+        this.$toasted.show("Select a birth date", {
+          type: "error"
+        });
+      } else if (!this.form.hobbies) {
+        this.$toasted.show("Input some hobbies", {
+          type: "error"
+        });
+      } else if (!this.checkDateValidity(this.form.birth_date)) {
+        this.$toasted.show("You cannot select a date in the future", {
+          type: "error"
+        });
+      } else {
+        // everything is good, edit student
+        return this.editStudent(this.selectedStudent);
       }
     },
     handleFileUpload() {
@@ -424,11 +463,13 @@ export default {
       this.form.photo = "";
       this.form.birth_date = "";
       this.form.hobbies = "";
+    },
+    callSelected(id) {
+      this.selectedStudent = id;
     }
   },
   created() {
     this.fetchStudents();
-    this.validateStudentCount();
   }
 };
 </script>
