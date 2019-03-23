@@ -5,9 +5,22 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    studentList: []
+    studentList: [],
   },
-  mutations: {},
-  actions: {},
-  getters: {}
+  mutations: {
+    addToStudentList(state, payload) {
+      state.studentList.push(payload);
+    },
+    deleteFromStudentList(state, id) {
+      state.studentList.splice(state.studentList.findIndex(student => student.id === id), 1)
+    },
+    updateStudent(state, student) {
+      const studentId = student.id
+      state.studentList.splice(state.studentList.findIndex(student => student.id === studentId), 1, student)
+    },
+  },
+  getters: {
+    students: state => state.studentList,
+    studentSize: state => state.studentList.length
+  }
 })
