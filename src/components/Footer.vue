@@ -1,5 +1,5 @@
 <template>
-  <footer class="pa-3">
+  <footer class="footer">
     <div class="foot">&copy; {{ date }} {{ company }}</div>
   </footer>
 </template>
@@ -11,7 +11,6 @@
   color: #ffffff;
   text-align: right !important;
   padding: 19px 30px 20px;
-  position: absolute;
   right: 0px;
   left: 250px;
 }

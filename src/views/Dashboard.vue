@@ -1,16 +1,16 @@
 <template>
   <div class="container">
     <div class="add_btn" style="display: flex ; justify-content: center;">
-      <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal">Add Student</button>
+      <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Student</button>
     </div>
 
-    <!-- Modal -->
+    <!-- Add Modal -->
     <div
       class="modal fade"
-      id="exampleModal"
+      id="addModal"
       tabindex="-1"
       role="dialog"
-      aria-labelledby="exampleModalLabel"
+      aria-labelledby="addModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog" role="document">
@@ -28,7 +28,7 @@
                 <input
                   type="file"
                   accept="image/jpeg, image/png"
-                  class="form-control"
+                  class="form-control-file"
                   ref="photo"
                   v-on:change="handleFileUpload()"
                   placeholder="Photo"
@@ -78,7 +78,98 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+              @click="closeModal()"
+            >Close</button>
+            <button type="button" class="btn btn-primary" @click="handleOk">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div
+      class="modal fade"
+      id="editModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="editModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Edit Student</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form @submit.stop.prevent="editStudent">
+              <div class="form-group">
+                <label for="photo">Photo</label>
+                <input
+                  type="file"
+                  accept="image/jpeg, image/png"
+                  class="form-control-file"
+                  ref="photo"
+                  v-on:change="handleFileUpload()"
+                  placeholder="Photo"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.first_name"
+                  placeholder="First Name"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.last_name"
+                  placeholder="Last Name"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for="hobbies">Hobbies</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="form.hobbies"
+                  placeholder="Hobbies"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for="birth_date">Birth Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="form.birth_date"
+                  placeholder="Date of Birth"
+                  required
+                >
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+              @click="closeModal()"
+            >Close</button>
             <button type="button" class="btn btn-primary" @click="handleOk">Save</button>
           </div>
         </div>
@@ -87,17 +178,16 @@
 
     <!-- Shows if there are no students -->
     <template v-if="!studentAvaliable">
-      <h2 class="text-danger text-center" style="margin-top: 50px;">Student list is empty</h2>
+      <h2
+        class="text-danger text-center"
+        style="margin-top: 50px; margin-bottom: 50px;"
+      >Student list is empty</h2>
     </template>
+
     <!-- Shows if there are students added -->
     <template v-else style="margin-bottom: 20px;">
       <div class="row" style="margin-bottom: 50px; ">
-        <div
-          class="col-lg-4"
-          style="margin-top: 25px;"
-          v-for="(item, index) in cardData"
-          :key="item.id"
-        >
+        <div class="col-lg-4" style="margin-top: 25px;" v-for="(item) in cardData" :key="item.id">
           <div class="card">
             <div class="card-body text-center">
               <div class="profile-pic m-b-20 m-t-20">
@@ -128,7 +218,11 @@
               </div>
               <hr>
               <div style="badge badge-pill badge-success text-white font-16; margin-top: 15px;">
-                <button class="btn btn-primary btn-sm" @click="unblock(item.id, index)">Edit</button>
+                <button
+                  class="btn btn-primary btn-sm"
+                  data-toggle="modal"
+                  data-target="#editModal"
+                >Edit</button>
                 <button
                   class="btn btn-danger btn-sm"
                   style="margin-left: 20px;"
@@ -201,18 +295,20 @@ export default {
     },
     async addStudent() {
       try {
-        this.form.birth_date = this.normalizeBirthDate(this.form.birth_date);
+        const newDate = this.normalizeBirthDate(this.form.birth_date);
 
         let formData = new FormData();
         formData.append("first_name", this.form.first_name);
         formData.append("last_name", this.form.last_name);
-        formData.append("birth_date", this.form.birth_date);
+        formData.append("birth_date", newDate);
         formData.append("hobbies", this.form.hobbies);
         formData.append("photo", this.form.photo);
 
-        await this.$http.post("/", formData);
+        const response = await this.$http.post("/", formData);
 
-        return;
+        this.$toasted.show(response.data.message, { type: "success" });
+
+        return this.$router.go();
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
@@ -230,8 +326,8 @@ export default {
         this.$toasted.show("Successfully deleted student", {
           type: "success"
         });
-
-        return this.fetchStudents();
+        this.fetchStudents();
+        return this.$router.go();
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
@@ -243,12 +339,12 @@ export default {
     },
     async editStudent(id) {
       try {
-        this.form.birth_date = this.normalizeBirthDate(this.form.birth_date);
+        const newDate = this.normalizeBirthDate(this.form.birth_date);
 
         let formData = new FormData();
         formData.append("first_name", this.form.first_name);
         formData.append("last_name", this.form.last_name);
-        formData.append("birth_date", this.form.birth_date);
+        formData.append("birth_date", newDate);
         formData.append("hobbies", this.form.hobbies);
         formData.append("photo", this.form.photo);
 
@@ -305,12 +401,12 @@ export default {
       // split it by /
       // select the individual indexes
       // concatenate it
-      let parts = date.split("/");
-      let month = parseInt(parts[0], 10);
-      let day = parseInt(parts[1], 10);
-      let year = parseInt(parts[2], 10);
+      let parts = date.split("-");
+      let year = parseInt(parts[0], 10);
+      let month = parseInt(parts[1], 10);
+      let day = parseInt(parts[2], 10);
 
-      const newDate = `${month}-${day}-${year}`;
+      const newDate = `${year}-${month}-${day}`;
 
       return newDate;
     },
@@ -321,6 +417,13 @@ export default {
         return false;
       }
       return true;
+    },
+    closeModal() {
+      this.form.first_name = "";
+      this.form.last_name = "";
+      this.form.photo = "";
+      this.form.birth_date = "";
+      this.form.hobbies = "";
     }
   },
   created() {
