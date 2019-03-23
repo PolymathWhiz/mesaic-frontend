@@ -238,6 +238,29 @@ export default {
         }
       }
     },
+    async editStudent(id) {
+      try {
+        let formData = new FormData();
+        formData.append("first_name", this.form.first_name);
+        formData.append("last_name", this.form.last_name);
+        formData.append("birth_date", this.form.birth_date);
+        formData.append("hobbies", this.form.hobbies);
+        formData.append("photo", this.form.photo);
+
+        const response = await this.$http.post(`/${id}`, formData);
+        this.$toasted.show(response.data.message, {
+          type: "success"
+        });
+        return;
+      } catch (error) {
+        if (error.response) {
+          const message = error.response.data.message;
+          return this.$toasted.show(message, {
+            type: "error"
+          });
+        }
+      }
+    },
     handleOk(evt) {
       // Prevent modal from closing
       evt.preventDefault();
