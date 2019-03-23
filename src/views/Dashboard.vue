@@ -29,7 +29,8 @@
                   type="file"
                   accept="image/jpeg, image/png"
                   class="form-control"
-                  v-on:change="form.photo"
+                  ref="photo"
+                  v-on:change="handleFileUpload()"
                   placeholder="Photo"
                   required
                 >
@@ -200,6 +201,8 @@ export default {
     },
     async addStudent() {
       try {
+        this.form.birth_date = this.normalizeBirthDate(this.form.birth_date);
+
         let formData = new FormData();
         formData.append("first_name", this.form.first_name);
         formData.append("last_name", this.form.last_name);
@@ -240,6 +243,8 @@ export default {
     },
     async editStudent(id) {
       try {
+        this.form.birth_date = this.normalizeBirthDate(this.form.birth_date);
+
         let formData = new FormData();
         formData.append("first_name", this.form.first_name);
         formData.append("last_name", this.form.last_name);
@@ -284,10 +289,38 @@ export default {
         this.$toasted.show("Input some hobbies", {
           type: "error"
         });
+      } else if (!this.checkDateValidity(this.form.birth_date)) {
+        this.$toasted.show("You cannot select a date in the future", {
+          type: "error"
+        });
       } else {
         // everything is good, add student
         this.addStudent();
       }
+    },
+    handleFileUpload() {
+      this.form.photo = this.$refs.photo.files[0];
+    },
+    normalizeBirthDate(date) {
+      // split it by /
+      // select the individual indexes
+      // concatenate it
+      let parts = date.split("/");
+      let month = parseInt(parts[0], 10);
+      let day = parseInt(parts[1], 10);
+      let year = parseInt(parts[2], 10);
+
+      const newDate = `${month}-${day}-${year}`;
+
+      return newDate;
+    },
+    checkDateValidity(date) {
+      const enteredDate = new Date(date);
+      const today = new Date();
+      if (enteredDate > today) {
+        return false;
+      }
+      return true;
     }
   },
   created() {
