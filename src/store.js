@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    studentList: []
+    studentList: [],
   },
   mutations: {
     addToStudentList(state, payload) {
@@ -20,6 +20,7 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    students: state => state.studentList
+    students: state => state.studentList,
+    studentSize: state => state.studentList.length
   }
 })

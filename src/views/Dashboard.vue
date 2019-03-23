@@ -1,14 +1,88 @@
 <template>
   <div class="container">
-    <div class="add_btn">
-      <button class="btn btn-success mr-auto">Add Student</button>
+    <div class="add_btn" style="display: flex ; justify-content: center;">
+      <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal">Add Student</button>
     </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add Student</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action>
+              <div class="form-group">
+                <label for>First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="first_name"
+                  placeholder="First Name"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for>First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="last_name"
+                  placeholder="Last Name"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for>Hobbies</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="hobbies"
+                  placeholder="Hobbies"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for>Birth Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="birth_date"
+                  placeholder="Date of Birth"
+                  required
+                >
+              </div>
+              <div class="form-group">
+                <label for>Photo</label>
+                <input type="file" class="form-control" placeholder="Photo" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Shows if there are no students -->
     <template v-if="!studentAvaliable">
-      <h1 class="text-danger">Students are not avaliable</h1>
+      <h2 class="text-danger text-center" style="margin-top: 50px;">Student list is empty</h2>
     </template>
     <!-- Shows if there are students added -->
-    <template v-else>
+    <template v-else style="margin-bottom: 20px;">
       <div class="row" style="margin-bottom: 50px; ">
         <div
           class="col-lg-4"
@@ -44,14 +118,21 @@
                   <span class="dob_holder">{{ new Date(item.created_at).toDateString() }}</span>
                 </p>
               </div>
+              <hr>
               <div style="badge badge-pill badge-success text-white font-16; margin-top: 15px;">
-                <button class="btn btn-success btn-block" @click="unblock(item.id, index)">Unblock</button>
+                <button class="btn btn-primary btn-sm" @click="unblock(item.id, index)">Edit</button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  style="margin-left: 20px;"
+                  @click="destroyStudent(item.id)"
+                >Delete</button>
               </div>
             </div>
           </div>
         </div>
       </div>
     </template>
+    <Footer></Footer>
   </div>
 </template>
 
@@ -67,7 +148,11 @@
 
 
 <script>
+import Footer from "@/components/Footer.vue";
 export default {
+  components: {
+    Footer
+  },
   data() {
     return {
       studentAvaliable: true,
@@ -113,7 +198,24 @@ export default {
         formData.append("hobbies", this.form.hobbies);
         formData.append("photo", this.form.photo);
 
-        const response = await this.$http.post("/", formData);
+        await this.$http.post("/", formData);
+
+        return;
+      } catch (error) {
+        if (error.response) {
+          const message = error.response.data.message;
+          return alert(message);
+        }
+      }
+    },
+    async destroyStudent(id) {
+      try {
+        await this.$http.delete(`/${id}`);
+        this.$store.commit("deleteFromStudentList", id);
+
+        alert("Successfully deleted student");
+
+        this.fetchStudents();
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
@@ -122,8 +224,15 @@ export default {
       }
     }
   },
+  computed: {
+    studentCount: function() {
+      this.$store.getters.studentSize;
+    }
+  },
+
   created() {
     this.fetchStudents();
+    this.validateStudentCount();
   }
 };
 </script>
