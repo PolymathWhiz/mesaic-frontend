@@ -132,6 +132,7 @@
         </div>
       </div>
     </template>
+
     <Footer></Footer>
   </div>
 </template>
@@ -145,7 +146,6 @@
   color: #1d2037 !important;
 }
 </style>
-
 
 <script>
 import Footer from "@/components/Footer.vue";
@@ -221,6 +221,33 @@ export default {
           const message = error.response.data.message;
           return alert(message);
         }
+      }
+    },
+    handleOk(evt) {
+      // Prevent modal from closing
+      evt.preventDefault();
+      if (!this.form.photo) {
+        this.$toasted.show("Please select a photo", {
+          type: "error"
+        });
+      } else if (this.form.first_name === "") {
+        this.$toasted.show("Enter a wallet name", {
+          type: "error"
+        });
+      } else if (this.form.last_name === "") {
+        this.$toasted.show("Enter a wallet number", {
+          type: "error"
+        });
+      } else if (!this.form.birth_date) {
+        this.$toasted.show("Select a wallet type", {
+          type: "error"
+        });
+      } else if (!this.form.hobbies) {
+        this.$toasted.show("", {
+          type: "error"
+        });
+      } else {
+        this.handleSubmit();
       }
     }
   },
