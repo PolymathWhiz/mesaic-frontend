@@ -192,7 +192,9 @@ export default {
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
-          return alert(message);
+          return this.$toasted.show(message, {
+            type: "error"
+          });
         }
       }
     },
@@ -211,7 +213,9 @@ export default {
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
-          return alert(message);
+          return this.$toasted.show(message, {
+            type: "error"
+          });
         }
       }
     },
@@ -220,13 +224,17 @@ export default {
         await this.$http.delete(`/${id}`);
         this.$store.commit("deleteFromStudentList", id);
 
-        alert("Successfully deleted student");
+        this.$toasted.show("Successfully deleted student", {
+          type: "success"
+        });
 
-        this.fetchStudents();
+        return this.fetchStudents();
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
-          return alert(message);
+          return this.$toasted.show(message, {
+            type: "error"
+          });
         }
       }
     },
