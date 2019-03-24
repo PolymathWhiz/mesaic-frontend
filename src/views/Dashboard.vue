@@ -235,8 +235,6 @@
         </div>
       </div>
     </template>
-
-    <Footer></Footer>
   </div>
 </template>
 
@@ -251,11 +249,7 @@
 </style>
 
 <script>
-import Footer from "@/components/Footer.vue";
 export default {
-  components: {
-    Footer
-  },
   data() {
     return {
       studentAvaliable: true,
