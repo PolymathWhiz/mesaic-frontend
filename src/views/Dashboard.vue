@@ -29,8 +29,8 @@
                   type="file"
                   accept="image/jpeg, image/png"
                   class="form-control-file"
-                  ref="photo"
-                  v-on:change="handleFileUpload()"
+                  ref="photoNew"
+                  v-on:change="handleNewFileUpload()"
                   placeholder="Photo"
                   required
                 >
@@ -353,11 +353,11 @@ export default {
 
         const response = await this.$http.patch(`/${id}`, formData);
 
-        this.$toasted.show(response.data.message, {
+        this.$router.go();
+
+        return this.$toasted.show(response.data.message, {
           type: "success"
         });
-
-        return this.$router.go();
       } catch (error) {
         if (error.response) {
           const message = error.response.data.message;
@@ -436,6 +436,9 @@ export default {
     handleFileUpload() {
       this.form.photo = this.$refs.photo.files[0];
     },
+    handleNewFileUpload() {
+      this.form.photo = this.$refs.photoNew.files[0];
+    },
     normalizeBirthDate(date) {
       // split it by /
       // select the individual indexes
@@ -468,7 +471,7 @@ export default {
       this.selectedStudent = id;
     }
   },
-  created() {
+  mounted() {
     this.fetchStudents();
   }
 };
