@@ -9,14 +9,14 @@ export default new Vuex.Store({
   },
   mutations: {
     addToStudentList(state, payload) {
-      state.studentList.push(payload);
+      return state.studentList.push(payload);
     },
     deleteFromStudentList(state, id) {
-      state.studentList.splice(state.studentList.findIndex(student => student.id === id), 1)
+      return state.studentList.splice(state.studentList.findIndex(student => student.id === id), 1)
     },
     updateStudent(state, student) {
       const studentId = student.id
-      state.studentList.splice(state.studentList.findIndex(student => student.id === studentId), 1, student)
+      return state.studentList.splice(state.studentList.findIndex(student => student.id === studentId), 1, student)
     },
   },
   getters: {
